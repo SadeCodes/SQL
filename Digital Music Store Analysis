@@ -1,0 +1,121 @@
+## Used the Data base chinook to pull various queries about a digital music store.
+### The biggest data set I;ve had to query yet. :) 
+
+
+
+
+-- Query Album titles and artist name 
+SELECT albums.title,artist.name
+FROM chinook.albums AS albums
+LEFT JOIN chinook.artists AS artist
+ON albums.ArtistId = artist.ArtistId
+ORDER BY albums.Title;
+
+--Show Customers (their full names, customer ID, and country) who are not in the US.
+SELECT FirstName, LastName, CustomerId, Country
+FROM chinook.customers
+WHERE Country <> 'USA'
+ORDER BY Country;
+
+--Show only the Customers from Brazil.
+SELECT FirstName, LastName, CustomerId, Country
+FROM chinook.customers
+WHERE Country = 'Brazil';
+
+--Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country.
+SELECT cx.LastName,cx.FirstName, invoices.InvoiceID, invoices.InvoiceDate, invoices.BillingCountry
+FROM chinook.invoices AS invoices
+LEFT JOIN chinook.customers AS cx
+ON invoices.CustomerId = cx.CustomerId
+WHERE BillingCountry = 'Brazil'
+ORDER BY LastName;
+
+--Show the Employees who are Sales Agents.
+SELECT LastName, FirstName,Title
+FROM chinook.employees
+WHERE Title= 'Sales Support Agent'
+ORDER BY LastName;
+
+--Find a unique/distinct list of billing countries from the Invoice table.
+SELECT DISTINCT BillingCountry
+FROM chinook.invoices;
+
+--Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name.
+SELECT invoices.InvoiceId, employee.LastName, employee.FirstName,employee.Title
+FROM chinook.employees AS employee
+LEFT JOIN chinook.customers AS cx
+ON employee.EmployeeId = cx.SupportRepId
+LEFT JOIN chinook.invoices AS invoices
+ON invoices.CustomerId=cx.CustomerId
+ORDER BY employee.LastName;
+
+--Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+SELECT invoices.Total, cx.LastName, cx.FirstName, cx.Country, employee.LastName, employee.FirstName,employee.Title
+FROM chinook.employees AS employee
+LEFT JOIN chinook.customers AS cx
+ON employee.EmployeeId = cx.SupportRepId
+LEFT JOIN chinook.invoices AS invoices
+ON invoices.CustomerId=cx.CustomerId
+ORDER BY cx.LastName;
+
+-- Sum of each Customers 
+SELECT SUM(invoices.Total), cx.LastName, cx.FirstName, cx.Country, employee.LastName, employee.FirstName,employee.Title
+FROM chinook.employees AS employee
+LEFT JOIN chinook.customers AS cx
+ON employee.EmployeeId = cx.SupportRepId
+LEFT JOIN chinook.invoices AS invoices
+ON invoices.CustomerId=cx.CustomerId 
+GROUP BY cx.LastName
+ORDER BY cx.LastName;
+
+--How many Invoices were there in 2009?
+SELECT *
+FROM chinook.invoices;
+
+SELECT COUNT(InvoiceDate) AS total_invoices
+FROM chinook.invoices
+WHERE InvoiceDate LIKE '2009%';
+
+--What are the total sales for 2009?
+SELECT SUM(Total) AS Total
+FROM chinook.invoices
+WHERE InvoiceDate >= '2009-01-01' AND InvoiceDate < '2010-01-01';
+
+--Write a query that includes the purchased track name with each invoice line ID.
+SELECT track.TrackId, track.Name, item.InvoiceLineId
+FROM chinook.tracks AS track
+LEFT JOIN chinook.invoice_items AS item
+ON track.TrackId = item.TrackId
+ORDER BY track.Name;
+
+--Write a query that includes the purchased track name AND artist name with each invoice line ID.
+SELECT tracks.Name AS title,artist.Name AS artist,items.InvoiceLineId 
+FROM chinook.tracks AS tracks
+LEFT JOIN chinook.invoice_items AS items
+ON tracks.TrackId = items.trackID
+LEFT JOIN chinook.albums AS albums
+ON albums.AlbumId= tracks.AlbumId
+LEFT JOIN chinook.artists AS artist
+ON artist.ArtistId= albums.AlbumId
+WHERE InvoiceLineId IS NOT NULL
+ORDER BY Title;
+
+--Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+SELECT albums.Title,tracks.Name AS TrackName,genre.Name AS Genre, media.name
+FROM chinook.tracks AS tracks
+LEFT JOIN chinook.albums AS albums
+ON tracks.AlbumId = albums.AlbumId
+LEFT JOIN chinook.media_types AS media
+ON media.MediaTypeId = tracks.MediaTypeId
+LEFT JOIN chinook.genres AS genre
+ON genre.GenreId = tracks.GenreId
+ORDER BY Title;
+
+--Show the total sales made by each sales agent.
+SELECT SUM(Total),employee.LastName,employee.Title
+FROM chinook.invoices AS invoices
+JOIN chinook.customers AS cx
+ON cx.CustomerId = invoices.CustomerId
+LEFT JOIN chinook.employees AS employee
+ON cx.SupportRepId = employee.EmployeeId
+GROUP BY EmployeeId;
