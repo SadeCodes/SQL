@@ -1,0 +1,33 @@
+--The customer would like to know what kind of accounts your bank offers. Display all the bank product names.--
+
+SELECT product_name
+From bank_products;
+
+--This customer is interested in opening a Checking or Savings account, but wants more information on the options.--
+SELECT product_name
+FROM bank_products
+WHERE product_type = 'Checking' 
+OR product_type= 'Savings';
+
+--The customer decided they want a savings account with a good interest rate and no monthly fee.--
+SELECT product_type, product_name, interest_rate, monthly_fee
+FROM bank_products
+WHERE product_type = 'Savings'
+AND interest_rate>= 0.75 
+AND monthly_fee= 0;
+
+--Using IN()--
+SELECT product_name,description
+FROM bank_products
+WHERE product_name IN('Premium Checking','High Yield Savings','Platinum Credit Card','Gold Credit Card');
+
+--Using LIKE. Use LIKE to list the product name that starts with the word “Business”.--
+SELECT product_name
+FROM bank_products
+WHERE product_name LIKE 'Business%';
+
+--A new customer wants something with rewards. Show the name and description for all products that have the word “reward” in either the name or description.--
+SELECT product_name,description
+FROM bank_products
+WHERE product_name LIKE '%reward%'
+OR description LIKE '%reward%';
